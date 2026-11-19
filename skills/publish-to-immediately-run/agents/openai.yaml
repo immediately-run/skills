@@ -1,0 +1,4 @@
+interface:
+  display_name: "Publish to immediately.run"
+  short_description: "Publish projects and verify their reading links"
+  default_prompt: "Use $publish-to-immediately-run to publish this project using my chosen GitHub repository and visibility."

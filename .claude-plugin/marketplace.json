@@ -5,18 +5,19 @@
     "url": "https://immediately.run"
   },
   "metadata": {
-    "description": "Skills for publishing to immediately.run: reports, and later boards, workbooks and apps, that run from GitHub in the reader's browser."
+    "description": "Skills for interactive apps, visual explanations, Grove reports, and GitHub publication on immediately.run."
   },
   "plugins": [
     {
       "name": "immediately-run",
-      "description": "Write a polished report as a Grove wiki and publish it to an immediately.run link.",
-      "version": "0.2.0",
+      "description": "Create interactive apps or Grove reports and publish them to immediately.run.",
+      "version": "0.3.0",
       "source": "./",
       "strict": false,
       "skills": [
         "./skills/grove-report",
-        "./skills/publish-to-immediately-run"
+        "./skills/publish-to-immediately-run",
+        "./skills/immediately-run-artifacts"
       ],
       "homepage": "https://github.com/immediately-run/skills",
       "license": "MIT"

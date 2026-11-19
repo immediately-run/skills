@@ -33,6 +33,8 @@ concurrency:
 
 jobs:
   build:
+    # Also guard manual dispatch if a repository later becomes private.
+    if: github.event.repository.private == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -54,27 +56,40 @@ jobs:
       # Two keys for the same build: the branch name, and the commit sha for links
       # pinned to a commit.
       - name: Build cache zip
+        env:
+          IR_REF: ${{ github.ref_name }}
+          IR_SHA: ${{ github.sha }}
+          IR_OWNER: ${{ github.repository_owner }}
+          IR_REPO: ${{ github.event.repository.name }}
+          IR_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           bundle=""
           [ -f package-lock.json ] && bundle="--bundle-packages"
-          for ref in "${{ github.ref_name }}" "${{ github.sha }}"; do
+          for ref in "$IR_REF" "$IR_SHA"; do
             npx -y @immediately-run/cli@0.9.1 cache-zip \
-              --owner "${{ github.repository_owner }}" \
-              --repo "${{ github.event.repository.name }}" \
+              --owner "$IR_OWNER" \
+              --repo "$IR_REPO" \
               --ref "$ref" \
-              --default-branch "${{ github.event.repository.default_branch }}" \
+              --default-branch "$IR_DEFAULT_BRANCH" \
               $bundle \
               --out "_site/cached_repositories/$ref.zip"
           done
 
       - name: Write index.html
+        env:
+          IR_REPOSITORY: ${{ github.repository }}
+          IR_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          cat > _site/index.html <<HTML
-          <!doctype html><meta charset="utf-8">
-          <title>${{ github.event.repository.name }}</title>
-          <meta http-equiv="refresh" content="0; url=https://immediately.run/present/github/${{ github.repository }}/main">
-          <p><a href="https://immediately.run/present/github/${{ github.repository }}/main">Read it on immediately.run</a></p>
-          HTML
+          node <<'JS'
+          const fs = require('node:fs');
+          const repository = process.env.IR_REPOSITORY.split('/').map(encodeURIComponent).join('/');
+          const branch = encodeURIComponent(process.env.IR_DEFAULT_BRANCH);
+          const url = `https://immediately.run/present/github/${repository}/${branch}`;
+          fs.writeFileSync('_site/index.html', `<!doctype html><meta charset="utf-8">
+          <title>Read on immediately.run</title>
+          <meta http-equiv="refresh" content="0; url=${url}">
+          <p><a href="${url}">Read it on immediately.run</a></p>`);
+          JS
 
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:

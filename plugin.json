@@ -1,0 +1,56 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "immediately-run",
+  "version": "0.3.0",
+  "description": "Create interactive apps, visual explanations, and Grove reports, then publish and verify them on immediately.run.",
+  "author": {
+    "name": "immediately.run",
+    "url": "https://immediately.run"
+  },
+  "homepage": "https://github.com/immediately-run/skills",
+  "repository": "https://github.com/immediately-run/skills",
+  "license": "MIT",
+  "keywords": [
+    "immediately.run",
+    "interactive",
+    "visualization",
+    "reports",
+    "github"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "immediately.run",
+        "shortDescription": "Build apps and visual reports",
+        "longDescription": "Create interactive visual explanations, simulations, and custom React apps, or turn research and data into themed Grove reports. Publish source to a GitHub repository and verify the reading experience on immediately.run. Choose an interactive app when controls and exploration are central, or a Grove report when prose, sections, charts, and cards lead. Includes guidance for sandbox-safe styles and assets, public Pages caching, existing repositories, and private access. Requires a code execution environment with the relevant project tools; publication requires the user's authorized GitHub access. Browser tools are needed for live render verification. This skills-only plugin does not include a hosted backend or MCP server and does not itself grant GitHub or immediately.run permissions.",
+        "category": "Developer Tools",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://immediately.run",
+        "supportURL": "https://github.com/immediately-run/skills/issues",
+        "defaultPrompt": [
+          "Explain Fourier series with interactive visuals in an immediately.run app.",
+          "Turn my research and data into a Grove report for immediately.run.",
+          "Publish this project to my chosen GitHub repository and check its immediately.run link."
+        ],
+        "brandColor": "#923CEB",
+        "composerIcon": "./assets/logo.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "prompts": [
+          "Explain Fourier series with sliders for harmonic count in an immediately.run app. Keep it local.",
+          "Turn these quarterly support figures into a Grove report for immediately.run with a summary and charts.",
+          "Publish this immediately.run app to a new public repository under my GitHub account.",
+          "Update this existing private immediately.run repository and preserve its current branch and visibility.",
+          "My React app works in Vite but has unreadable colors and missing fonts on immediately.run. Diagnose and fix it."
+        ]
+      },
+      "publication": {
+        "release_notes": "Adds an interactive React-artifact skill, Codex skill metadata, shared publication guidance, sandbox styling and asset checks, and a portable plugin package while preserving Grove and existing agent integrations."
+      }
+    }
+  }
+}

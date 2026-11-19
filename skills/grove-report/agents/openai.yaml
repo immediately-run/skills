@@ -1,0 +1,4 @@
+interface:
+  display_name: "Grove Reports"
+  short_description: "Create themed, shareable immediately.run reports"
+  default_prompt: "Use $grove-report to turn my material into a Grove report for immediately.run."
