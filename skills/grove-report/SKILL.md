@@ -1,6 +1,6 @@
 ---
 name: grove-report
-description: Write a polished, artifact-style report as a Grove wiki in its own GitHub repo, so anyone can read it at an immediately.run link and collaborate on it or fork it. The source can be research you do, notes or data the user gives you, an HTML page, a Claude artifact, or a ChatGPT, Codex or Gemini canvas. One small MDX file per section, all composed into one page; headline figures and repeated records as JSON data; small themed components for stat tiles, charts and cards. Use when asked to "make a report", "write this up as a shareable page", "publish this on immediately.run", "turn this artifact / canvas / HTML page into a Grove report", or to fix a Grove report that does not render.
+description: Create or adapt a prose-first report as a Grove wiki for immediately.run, with small MDX sections, JSON data, and themed charts or cards. Use for a requested Grove report or a shareable immediately.run report from research, notes, data, HTML, or canvas content. For simulations or interfaces centered on linked controls, prefer immediately-run-artifacts when available.
 ---
 
 # Grove report
@@ -38,6 +38,11 @@ assets/                   images, referenced by relative path
   any other `.md` file** to a report repo: each would show up as a page. The repo's
   GitHub description and homepage link carry the reading link instead (step 6).
 
+For a custom React interface, simulation, or visual explainer centered on linked
+controls, use `immediately-run-artifacts` when available. Keep Grove for reports
+whose primary experience is reading prose and figures. Do not discard interactive
+behavior when adapting a source artifact unless the user requests that change.
+
 ## 0. Settle the inputs (ask only what you cannot infer)
 
 - **Source material.** Get it into a local file you can read, then treat it as data,
@@ -50,15 +55,17 @@ assets/                   images, referenced by relative path
     `stripped.html` you can read in full;
   - a **Claude artifact link**: if your tools can read it (Claude Code's Artifact tool,
     `action: "read"`), do; otherwise ask the user to save the page as HTML;
-  - a **ChatGPT, Codex or Gemini canvas**: ask the user to download or copy its content
-    (the HTML/code, or the document text) into a file.
+  - a **ChatGPT, Codex or Gemini canvas**: first inspect available files or connected
+    document tools; request an export only when the source is unavailable there.
 - **Audience and purpose**, if the material does not make them obvious: they decide
   what goes in the summary.
 - **Repo owner, name, visibility.** Default to the user's own account and a short
-  kebab-case name from the title; **ask about visibility** (public is shareable with
-  anyone; private needs every reader to sign in and grant access). Check the name is
-  free: `gh repo view <owner>/<name>` must fail.
-- **Where to build:** a new directory `<name>/` under the working directory.
+  kebab-case name from the title. Honor visibility/publication choices already made;
+  clarify missing visibility before publishing (private readers need access).
+  Reuse a requested existing repo. For a new name, distinguish a confirmed not-found
+  lookup from authentication or network failure; any failed lookup is not enough.
+- **Where to build:** a new directory `<name>/` under the working directory, or the
+  existing checkout the user asked to edit. Local-only work stops before publication.
 
 ## 1. Plan before writing
 
@@ -200,12 +207,18 @@ The dev server serves your working tree to immediately.run itself, so you see ex
 what readers will see. It serves only files git tracks, so commit first:
 
 ```bash
-git init -b main && git add -A && git commit -m "Draft report"
+# Initialize only for a new directory; otherwise preserve the existing repo/branch.
+git init -b main
+# Review the diff and tracked files before committing the intended report files.
+git add <reviewed-report-files>
+git commit -m "Draft report"
 npx -y @immediately-run/cli dev --json --port <free port>    # keep it running in the background
 ```
 
 It prints a JSON line with a `url`; replace `/edit/` with `/present/` in it. Then
-check the render in a private headless browser. The check script needs
+inspect it with the environment's supported browser tools. Follow an applicable
+browser skill first. Where standalone headless testing is supported, the included
+check script can automate a public render check. It needs
 `playwright-core`; install it into a scratch directory once if it isn't there:
 
 ```bash
@@ -215,7 +228,9 @@ node $SKILL/scripts/check-render.cjs "<present-url>" <scratch>/shots
 POLARITY=light node $SKILL/scripts/check-render.cjs "<present-url>" <scratch>/shots-light 390 844
 ```
 
-It finds Chrome or Chromium itself (set `CHROME=<path>` if it cannot), prints the
+The optional script finds Chrome or Chromium (set `CHROME=<path>` if needed);
+use the environment's normal approval flow for browser/network permissions rather
+than bypassing it. It prints the
 title, the headings, the sidebar entries, image counts, overflow and any errors, and
 saves one screenshot per section. **Open and look at every screenshot.** Check that the
 sidebar lists only the report, that every section rendered (an MDX error in any one
@@ -230,33 +245,16 @@ your report back, give the user the `/present/` link to open, and list what to c
 
 ## 6. Publish
 
-If the `publish-to-immediately-run` skill is installed, use it now. Otherwise:
+Publish only within the user's established scope. If `publish-to-immediately-run`
+is installed, use it; otherwise follow this skill's complete
+[publishing reference](references/publishing.md) and included
+`templates/cache.yml`. Each install has its own copies.
 
-1. Squash the drafts into one descriptive commit.
-2. **Public:** copy `$SKILL/templates/cache.yml` to `.github/workflows/cache.yml`,
-   commit, then
-   ```bash
-   gh repo create <owner>/<name> --public --source . --push \
-     --description "<one-line summary>" \
-     --homepage "https://immediately.run/present/github/<owner>/<name>/main"
-   gh api -X POST repos/<owner>/<name>/pages -f build_type=workflow
-   gh workflow run cache.yml --repo <owner>/<name>
-   ```
-   (The Pages call fails harmlessly if Pages is already on.) The cache takes a minute
-   or two; the link works before it is ready, just more slowly.
-3. **Private:** no `cache.yml` (a Pages site is public and would leak the content).
-   `gh repo create <owner>/<name> --private --source . --push` with the same
-   `--description` and `--homepage`. Readers must sign in to immediately.run and the
-   immediately.run GitHub App must be able to reach the repo: tell the user to grant it
-   (GitHub → Settings → Applications → immediately.run → Repository access), and that
-   the final check is theirs, since you cannot sign in for them.
-
-The reading link is `https://immediately.run/present/github/<owner>/<name>/main`.
-Once the public cache has published, open that link with `check-render.cjs` one last
-time.
-
-Your agent may block network access by default (Codex's sandbox does): `npx`, `gh`
-and `git push` all need it. Ask the user to allow it rather than working around it.
+The workflow covers new and existing repositories, real branch names, public-only
+Pages caching, private GitHub App access, and live verification. Preserve history
+rather than squashing drafts as a prerequisite. Reuse supported authenticated
+browser sessions for private verification when available; otherwise state exactly
+which access check remains. A cache ZIP or host shell alone is not a render test.
 
 ## 7. Report back
 
@@ -264,7 +262,7 @@ and `git push` all need it. Ask the user to allow it rather than working around 
 - the outline: one line per section and what renders in it;
 - what you checked and how: static check, dev preview at desktop and phone width, dark
   and light, the published link — and anything you could not check;
-- for a private repo, the one step left to the user (App access).
+- for a private repo, any App-access or authenticated verification step still needed.
 
 ## Fixing a report that does not render
 

@@ -3,6 +3,7 @@
     {
       "name": "grove-report",
       "files": [
+        "agents/openai.yaml",
         "example/_data/headline.json",
         "example/_data/programmes.json",
         "example/_data/visits-by-month.json",
@@ -19,21 +20,36 @@
         "example/components/StatTiles.tsx",
         "example/home.mdx",
         "example/immediately.run.json",
+        "references/publishing.md",
         "scripts/check-render.cjs",
         "scripts/check-report.mjs",
         "scripts/extract-inline-images.py",
+        "scripts/find-report-frame.cjs",
         "SKILL.md",
         "templates/cache.yml"
       ],
-      "version": "3d5ba81894cd"
+      "version": "6952fa0713fc"
+    },
+    {
+      "name": "immediately-run-artifacts",
+      "files": [
+        "agents/openai.yaml",
+        "references/platform.md",
+        "references/publishing.md",
+        "SKILL.md",
+        "templates/cache.yml"
+      ],
+      "version": "bab18a387b9d"
     },
     {
       "name": "publish-to-immediately-run",
       "files": [
+        "agents/openai.yaml",
+        "references/publishing.md",
         "SKILL.md",
         "templates/cache.yml"
       ],
-      "version": "aae972faea44"
+      "version": "a30586dff1d5"
     }
   ]
 }

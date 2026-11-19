@@ -25,6 +25,7 @@
 // reported a problem (the reasons are printed).
 const fs = require('fs');
 const path = require('path');
+const { findReportFrame } = require('./find-report-frame.cjs');
 
 function loadPlaywright() {
   if (process.env.PLAYWRIGHT_CORE) return require(path.resolve(process.env.PLAYWRIGHT_CORE));
@@ -78,9 +79,7 @@ const { chromium } = loadPlaywright();
     executablePath: findBrowser(chromium),
     headless: true,
     ...(proxy ? { proxy: { server: proxy, bypass: '127.0.0.1,localhost' } } : {}),
-    // Chrome 142+ asks before a public page fetches http://127.0.0.1 (the dev
-    // server); these switch that prompt off for this private instance only.
-    args: ['--disable-features=LocalNetworkAccessChecks,PrivateNetworkAccessRespectPreflightResults,BlockInsecurePrivateNetworkRequests'],
+    // Use normal browser permission handling; do not disable local-network checks.
   });
   const context = await browser.newContext({ viewport: { width: +w, height: +h } });
   const page = await context.newPage();
@@ -93,10 +92,7 @@ const { chromium } = loadPlaywright();
   let frame = null;
   for (let i = 0; i < 90 && !frame; i++) {
     await page.waitForTimeout(1000);
-    for (const f of page.frames()) {
-      if (!f.url().includes('sandbox.')) continue;
-      try { if (await f.evaluate(() => !!document.querySelector('main h1, article h1, h1'))) frame = f; } catch {}
-    }
+    frame = await findReportFrame(page);
   }
   if (!frame) {
     await page.screenshot({ path: path.join(outDir, 'not-rendered.png') });

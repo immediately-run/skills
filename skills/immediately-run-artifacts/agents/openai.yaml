@@ -1,0 +1,4 @@
+interface:
+  display_name: "immediately.run Artifacts"
+  short_description: "Build interactive visual immediately.run apps"
+  default_prompt: "Use $immediately-run-artifacts to create an interactive visual explanation for immediately.run."

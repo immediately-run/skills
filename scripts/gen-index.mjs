@@ -14,8 +14,9 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const skillsDir = path.join(root, 'skills');
 const check = process.argv.includes('--check');
 const problems = [];
@@ -23,7 +24,8 @@ const problems = [];
 // Files that more than one skill carries, because a skill must stand alone when it
 // is installed by itself. Each group must stay byte-identical.
 const SHARED = [
-  ['skills/grove-report/templates/cache.yml', 'skills/publish-to-immediately-run/templates/cache.yml'],
+  ['grove-report', 'publish-to-immediately-run', 'immediately-run-artifacts'].map((name) => `skills/${name}/templates/cache.yml`),
+  ['grove-report', 'publish-to-immediately-run', 'immediately-run-artifacts'].map((name) => `skills/${name}/references/publishing.md`),
 ];
 
 function walk(dir, out = []) {
